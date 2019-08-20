@@ -1,68 +1,209 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## App.js
+import React, { useState } from "react";
+import "./App.css";
 
-## Available Scripts
+function Todo({ todo, index, completeTodo, removeTodo }) {
+  return (
+    <div
+      className="todo"
+      style={{ textDecoration: todo.isCompleted ? "line-through" : "" }}
+    >
+      {todo.text}
 
-In the project directory, you can run:
+      <div>
+        <button onClick={() => completeTodo(index)}>Complete</button>
+        <button onClick={() => removeTodo(index)}>x</button>
+      </div>
+    </div>
+  );
+}
 
-### `npm start`
+function TodoForm({ addTodo }) {
+  const [value, setValue] = useState("");
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+  const handleSubmit = e => {
+    e.preventDefault();
+    if (!value) return;
+    addTodo(value);
+    setValue("");
+  };
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        className="input"
+        value={value}
+        onChange={e => setValue(e.target.value)}
+      />
+    </form>
+  );
+}
 
-### `npm test`
+function App() {
+  const [todos, setTodos] = useState([
+    {
+      text: "Learn about React",
+      isCompleted: false
+    },
+    {
+      text: "Meet friend for lunch",
+      isCompleted: false
+    },
+    {
+      text: "Build really cool todo app",
+      isCompleted: false
+    }
+  ]);
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  const addTodo = text => {
+    const newTodos = [...todos, { text }];
+    setTodos(newTodos);
+  };
 
-### `npm run build`
+  const completeTodo = index => {
+    const newTodos = [...todos];
+    newTodos[index].isCompleted = true;
+    setTodos(newTodos);
+  };
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  const removeTodo = index => {
+    const newTodos = [...todos];
+    newTodos.splice(index, 1);
+    setTodos(newTodos);
+  };
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+  return (
+    <div className="app">
+      <div className="todo-list">
+        {todos.map((todo, index) => (
+          <Todo
+            key={index}
+            index={index}
+            todo={todo}
+            completeTodo={completeTodo}
+            removeTodo={removeTodo}
+          />
+        ))}
+        <TodoForm addTodo={addTodo} />
+      </div>
+    </div>
+  );
+}
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+export default App;
 
-### `npm run eject`
+## OLDApp.js
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+import React, { Component } from "react";
+import "./App.css";
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+const Todo = ({ todo, index, completeTodo, removeTodo }) => (
+  <div
+    className="todo"
+    style={{ textDecoration: todo.isCompleted ? "line-through" : "" }}
+  >
+    {todo.text}
+    <button onClick={() => completeTodo(index)}>Complete</button>
+    <button onClick={() => removeTodo(index)}>x</button>
+  </div>
+);
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+class TodoForm extends Component {
+  state = { value: "" };
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+  updateValue = e => this.setState({ value: e.target.value });
 
-## Learn More
+  handleSubmit = e => {
+    e.preventDefault();
+    if (!this.state.value) return;
+    this.props.addTodo(this.state.value);
+    this.setState({ value: "" });
+  };
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  render() {
+    const { value } = this.state;
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    return (
+      <form onSubmit={this.handleSubmit}>
+        <input
+          type="text"
+          className="input"
+          value={value}
+          onChange={this.updateValue}
+        />
+      </form>
+    );
+  }
+}
 
-### Code Splitting
+class App extends Component {
+  state = {
+    todos: [
+      {
+        text: "Learn about React",
+        isCompleted: false
+      },
+      {
+        text: "Meet friend for lunch",
+        isCompleted: false
+      },
+      {
+        text: "Build really cool todo app",
+        isCompleted: false
+      }
+    ]
+  };
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+  addTodo = text => {
+    const newTodos = [...this.state.todos, { text }];
+    this.setState({ todos: newTodos });
+  };
 
-### Analyzing the Bundle Size
+  completeTodo = index => {
+    const newTodos = [...this.state.todos];
+    newTodos[index].isCompleted = true;
+    this.setState({ todos: newTodos });
+  };
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+  removeTodo = index => {
+    const newTodos = [...this.state.todos];
+    newTodos.splice(index, 1);
+    this.setState({ todos: newTodos });
+  };
 
-### Making a Progressive Web App
+  render() {
+    const { todos } = this.state;
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+    return (
+      <div className="hero is-info">
+        <div className="hero-body">
+          <div className="container">
+            <div className="columns">
+              <div className="column is-6">
+                <div className="card">
+                  <div className="card-content">
+                    {todos.map((todo, index) => (
+                      <Todo
+                        key={index}
+                        index={index}
+                        todo={todo}
+                        completeTodo={this.completeTodo}
+                        removeTodo={this.removeTodo}
+                      />
+                    ))}
+                  </div>
+                  <div className="card-footer">
+                    <TodoForm addTodo={this.addTodo} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
 
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+export default App;
